@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50">
+
+<main class="max-w-4xl mx-auto py-10 px-4">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-slate-800" th:text="${trip.bus.busType}">Loại xe</h2>
+        <p class="text-slate-500 mt-2" th:text="${trip.route.departure.name + ' ➔ ' + trip.route.destination.name}"></p>
+        <p class="text-sm font-medium text-orange-600" th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}"></p>
+    </div>
+
+    <div class="flex justify-center space-x-6 mb-8 text-sm">
+        <div class="flex items-center"><div class="w-5 h-5 bg-white border-2 border-slate-300 rounded mr-2"></div> Trống</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-blue-500 rounded mr-2"></div> Đang chọn</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-slate-300 rounded mr-2"></div> Đã đặt</div>
+    </div>
+
+    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+
+        <div th:if="${trip.bus.busType == 'Giường nằm'}" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Tầng dưới</h3>
+                <div class="grid grid-cols-3 gap-4 border-2 border-dashed border-slate-200 p-4 rounded-2xl">
+                    <th:block th:each="seat : ${seats}">
+                        <div th:if="${#strings.startsWith(seat.seatNumber, 'A')}" th:insert="~{::seat-fragment}"></div>
+                    </th:block>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Tầng trên</h3>
+                <div class="grid grid-cols-3 gap-4 border-2 border-dashed border-slate-200 p-4 rounded-2xl">
+                    <th:block th:each="seat : ${seats}">
+                        <div th:if="${#strings.startsWith(seat.seatNumber, 'B')}" th:insert="~{::seat-fragment}"></div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phần dành cho xe Ghế ngồi / Limousine (Không phải Giường nằm) -->
+        <div th:unless="${trip.bus.busType == 'Giường nằm'}" class="max-w-md mx-auto">
+            <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Sơ đồ ghế</h3>
+
+            <!-- Cải thiện grid: Tự động chia cột dựa trên loại xe -->
+            <div class="grid gap-4 border-2 border-dashed border-slate-200 p-6 rounded-2xl"
+                 th:classappend="${trip.bus.busType.contains('Limousine') ? 'grid-cols-3' : 'grid-cols-4'}">
+
+                <!-- QUAN TRỌNG: Lặp qua toàn bộ danh sách ghế -->
+                <th:block th:each="s : ${seats}">
+                    <div class="flex justify-center">
+                        <!-- Nút cho ghế đã đặt hoặc đang chờ -->
+                        <button th:if="${s.status?.toString() != 'AVAILABLE'}" disabled
+                                class="w-14 h-14 bg-slate-200 text-slate-400 rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+                            <span th:text="${s.seatNumber}"></span>
+                        </button>
+
+                        <!-- Nút cho ghế còn trống -->
+                        <a th:if="${s.status?.toString() == 'AVAILABLE'}"
+                           th:href="@{/booking/confirm(tripId=${trip.id}, seatId=${s.id})}"
+                           class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl
+                          flex items-center justify-center hover:bg-blue-500 hover:text-white
+                          transition-all duration-200 font-bold shadow-sm active:scale-90">
+                            <span th:text="${s.seatNumber}"></span>
+                        </a>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-100 flex justify-between items-center">
+            <div>
+                <p class="text-slate-500 text-sm">Giá vé niêm yết:</p>
+                <p class="text-2xl font-bold text-blue-600" th:text="${#numbers.formatDecimal(trip.price, 0, 'COMMA', 0, 'POINT') + 'đ'}"></p>
+            </div>
+            <a href="/" class="text-slate-400 hover:text-slate-600 font-medium flex items-center">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</main>
+
+<div th:fragment="seat-fragment"  class="flex justify-center">
+    <th:block th:if="${seat != null}">
+        <button th:if="${seat.status?.toString() != 'AVAILABLE'}" disabled
+                class="w-14 h-14 bg-slate-200 text-slate-400 rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+            <span th:text="${seat.seatNumber}"></span>
+        </button>
+
+        <a th:if="${seat.status?.toString() == 'AVAILABLE'}"
+           th:href="@{/booking/confirm(tripId=${trip.id}, seatId=${seat.id})}"
+           class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl
+                  flex items-center justify-center hover:bg-blue-500 hover:text-white
+                  transition-all duration-200 font-bold shadow-sm active:scale-90">
+            <span th:text="${seat.seatNumber}"></span>
+        </a>
+    </th:block>
+</div>
+
+<script>lucide.createIcons();</script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+package com.example.bus_ticket_prj_jvapl.controller;
+
+import com.example.bus_ticket_prj_jvapl.model.entity.Seat;
+import com.example.bus_ticket_prj_jvapl.model.entity.Trip;
+import com.example.bus_ticket_prj_jvapl.model.entity.enums.SeatStatus;
+import com.example.bus_ticket_prj_jvapl.repository.SeatRepository;
+import com.example.bus_ticket_prj_jvapl.repository.TripRepository;
+import com.example.bus_ticket_prj_jvapl.service.SeatService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Controller
+@RequestMapping("/booking")
+public class BookingController {
+
+    @Autowired
+    private SeatService seatService;
+    @Autowired private TripRepository tripRepository;
+   // Tiêm Repository vào đây
+    // Bước 1: Hiển thị sơ đồ ghế sau khi khách chọn chuyến
+    @GetMapping("/select-seat")
+    public String showSeatMap(@RequestParam Long tripId, Model model) {
+        // Lấy danh sách SeatMapDTO (đã gắn status AVAILABLE/PENDING/BOOKED)
+        var seats = seatService.getSeatMapForTrip(tripId);
+
+        model.addAttribute("seats", seats);
+        model.addAttribute("trip", tripRepository.findById(tripId).orElse(null));
+
+        return "passenger/select-seat"; // templates/passenger/select-seat.html
+    }
+    @GetMapping("/search")
+    public String searchTrips(@RequestParam String departure,
+                              @RequestParam String destination,
+                              @RequestParam String date,
+                              Model model) {
+        try {
+            LocalDate travelDate = LocalDate.parse(date);
+            List<Trip> trips = tripRepository.findAvailableTrips(departure, destination, travelDate);
+
+            model.addAttribute("trips", trips);
+            model.addAttribute("departure", departure);
+            model.addAttribute("destination", destination);
+            model.addAttribute("date", date);
+
+            return "passenger/trip-results";
+        } catch (Exception e) {
+            // Nếu date không đúng định dạng hoặc lỗi khác
+            return "redirect:/?error";
+        }
+    }
+    // Trong BookingController.java
+
+    @GetMapping("/confirm")
+    public String confirmBooking(@RequestParam Long tripId,
+                                 @RequestParam Long seatId,
+                                 Model model) {
+        // 1. Lấy thông tin chuyến đi từ database
+        Trip trip = tripRepository.findById(tripId).orElse(null);
+
+        // 2. Lấy thông tin ghế từ database (bạn có thể dùng SeatRepository)
+        // Giả sử bạn inject SeatRepository vào controller này
+        // Seat seat = seatRepository.findById(seatId).orElse(null);
+
+        // 3. Truyền dữ liệu sang trang xác nhận
+        model.addAttribute("trip", trip);
+        model.addAttribute("seatId", seatId);
+
+        // 4. Trả về trang giao diện xác nhận thông tin (bạn cần tạo file này)
+        return "passenger/confirm-booking";
+    }
+
+}

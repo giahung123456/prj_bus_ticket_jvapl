@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 flex">
+
+<!-- Sử dụng Sidebar Fragment của bạn -->
+<div th:replace="~{admin/fragments :: admin_sidebar}"></div>
+
+<!-- Nội dung chính -->
+<main class="flex-1 p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">Danh sách Tuyến đường</h2>
+        <button onclick="document.getElementById('routeModal').showModal()"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            + Thêm tuyến mới
+        </button>
+    </div>
+
+    <!-- Bảng hiển thị -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="p-4 font-semibold text-slate-600">ID</th>
+                <th class="p-4 font-semibold text-slate-600">Điểm đi</th>
+                <th class="p-4 font-semibold text-slate-600">Điểm đến</th>
+                <th class="p-4 font-semibold text-slate-600">Khoảng cách (km)</th>
+                <th class="p-4 font-semibold text-slate-600">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            <tr th:each="route : ${routes}" class="hover:bg-slate-50 transition">
+                <td class="p-4 text-slate-700" th:text="${route.id}">1</td>
+                <!-- Hiển thị tên tỉnh thành thay vì ID -->
+                <td class="p-4 font-medium text-blue-600" th:text="${route.departure.name}">Hà Nội</td>
+                <td class="p-4 font-medium text-red-600" th:text="${route.destination.name}">Hải Phòng</td>
+                <td class="p-4 text-slate-600" th:text="${route.distance + ' km'}">120 km</td>
+                <td class="p-4">
+                    <button class="text-slate-400 hover:text-blue-600 mr-2"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+                    <button class="text-slate-400 hover:text-red-600"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Modal Thêm tuyến đường (Native HTML Dialog) -->
+<dialog id="routeModal" class="rounded-xl shadow-2xl p-0 w-full max-w-md backdrop:bg-slate-900/50">
+    <div class="p-6">
+        <h3 class="text-xl font-bold mb-4">Thêm Tuyến Đường</h3>
+        <form th:action="@{/admin/routes/save}" method="post" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Điểm đi</label>
+                <select name="departure.id" class="w-full p-2 border rounded-lg">
+                    <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Điểm đến</label>
+                <select name="destination.id" class="w-full p-2 border rounded-lg">
+                    <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Khoảng cách (km)</label>
+                <input type="number" name="distance" class="w-full p-2 border rounded-lg" required>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2 text-slate-600">Hủy</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Lưu lại</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

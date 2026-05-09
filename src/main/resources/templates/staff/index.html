@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100">
+<nav class="bg-white shadow-md p-4 flex justify-between items-center px-10">
+    <div class="flex items-center text-orange-600 font-bold text-xl">
+        <i data-lucide="ticket" class="mr-2"></i> STAFF PORTAL
+    </div>
+    <div class="flex items-center space-x-6">
+        <a href="/staff/tickets" class="font-medium text-slate-700 hover:text-orange-600">Duyệt vé</a>
+        <a href="/staff/seats" class="font-medium text-slate-700 hover:text-orange-600">Quản lý sơ đồ</a>
+        <a href="/profile" class="flex items-center font-medium text-slate-700 hover:text-orange-600">
+            <i data-lucide="circle-user" class="w-5 h-5 mr-1"></i> Hồ sơ
+        </a>
+
+            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700"><a href="/logout" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
+                Đăng xuất
+            </a></button>
+
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto py-10 px-4">
+    <h2 class="text-2xl font-bold mb-6">Vé chờ xác nhận thanh toán</h2>
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-slate-50 border-b">
+            <tr>
+                <th class="p-4">Mã vé</th>
+                <th class="p-4">Khách hàng</th>
+                <th class="p-4">Chuyến</th>
+                <th class="p-4">Tổng tiền</th>
+                <th class="p-4">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="border-b hover:bg-orange-50/50">
+                <td class="p-4 font-mono font-bold">#BT12345</td>
+                <td class="p-4">Nguyễn Văn A - 0987xxx</td>
+                <td class="p-4">Hà Nội → Hải Phòng</td>
+                <td class="p-4 font-bold text-blue-600">150,000đ</td>
+                <td class="p-4">
+                    <button class="bg-green-500 text-white px-3 py-1 rounded shadow hover:bg-green-600">Xác nhận</button>
+                    <button class="bg-red-100 text-red-600 px-3 py-1 rounded ml-2 hover:bg-red-200">Hủy</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script>lucide.createIcons();</script>
+</body>
+</html>

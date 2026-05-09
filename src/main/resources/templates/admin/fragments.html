@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div th:fragment="admin_sidebar" class="w-64 bg-slate-900 text-white p-6 shadow-xl min-h-screen flex flex-col">
+    <h1 class="text-2xl font-bold text-blue-400 mb-10 flex items-center">
+        <i data-lucide="shield-check" class="mr-2"></i> Admin Pro
+    </h1>
+
+    <div class="mb-8 p-4 bg-slate-800/50 rounded-xl border border-slate-700" th:if="${session.loggedInUser != null}">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-white shadow-lg">
+                <span th:text="${#strings.substring(session.loggedInUser.username, 0, 1).toUpperCase()}">A</span>
+            </div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-semibold truncate" th:text="${session.loggedInUser.username}">Admin Name</p>
+                <p class="text-[10px] text-blue-400 uppercase tracking-wider font-bold" th:text="${session.loggedInUser.role}">ADMIN</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="space-y-4 flex-1">
+        <a href="/admin/index" class="flex items-center p-3 hover:bg-blue-600 rounded-lg transition-all"
+           th:classappend="${activePage == 'dashboard' ? 'bg-blue-600' : ''}">
+            <i data-lucide="layout-dashboard" class="mr-3"></i> Dashboard
+        </a>
+
+        <a href="/admin/buses" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-all"
+           th:classappend="${activePage == 'buses' ? 'bg-blue-600' : ''}">
+            <i data-lucide="bus" class="mr-3"></i> Quản lý Xe
+        </a>
+
+        <a href="/admin/routes" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-all"
+           th:classappend="${activePage == 'routes' ? 'bg-blue-600' : ''}">
+            <i data-lucide="map-pinned" class="mr-3"></i> Tuyến đường
+        </a>
+        <!-- Thêm đoạn này vào trong thẻ <nav> của Sidebar -->
+        <a href="/admin/trips" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-all"
+           th:classappend="${activePage == 'trips' ? 'bg-blue-600' : ''}">
+            <i data-lucide="calendar-days" class="mr-3"></i> Quản lý Chuyến đi
+        </a>
+    </nav>
+
+    <div class="pt-10 border-t border-slate-800">
+        <a href="/logout" class="flex items-center p-3 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
+            <i data-lucide="log-out" class="mr-3"></i> Đăng xuất
+        </a>
+    </div>
+</div>
+</body>
+</html>

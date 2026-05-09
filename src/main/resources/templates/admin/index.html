@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 text-white p-6 shadow-xl">
+        <h1 class="text-2xl font-bold text-blue-400 mb-10 flex items-center">
+            <i data-lucide="shield-check" class="mr-2"></i> Admin Pro
+        </h1>
+        <nav class="space-y-4">
+            <a href="#" class="flex items-center p-3 bg-blue-600 rounded-lg"><i data-lucide="layout-dashboard" class="mr-3"></i> Dashboard</a>
+            <a href="/admin/buses" class="flex items-center p-3 hover:bg-slate-800 rounded-lg">
+                <i data-lucide="bus" class="mr-3"></i> Quản lý Xe
+            </a>
+            <a href="/admin/routes" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-all"
+               th:classappend="${activePage == 'routes' ? 'bg-blue-600' : ''}">
+                <i data-lucide="map-pinned" class="mr-3"></i> Tuyến đường
+            </a>
+            <!-- Thêm đoạn này vào trong thẻ <nav> của Sidebar -->
+            <a href="/admin/trips" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-all"
+               th:classappend="${activePage == 'trips' ? 'bg-blue-600' : ''}">
+                <i data-lucide="calendar-days" class="mr-3"></i> Quản lý Chuyến đi
+            </a>
+            <a href="#" class="flex items-center p-3 hover:bg-slate-800 rounded-lg"><i data-lucide="bar-chart-3" class="mr-3"></i> Báo cáo doanh thu</a>
+            <div class="pt-10">
+                <a href="/logout" class="flex items-center p-3 text-red-400 hover:bg-red-900/20 rounded-lg"><i data-lucide="log-out" class="mr-3"></i> Đăng xuất</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto p-8">
+        <header class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-slate-800">Hệ thống Quản trị</h2>
+            <!-- THAY BẰNG MỚI (Thêm thẻ <a> bao quanh tên để click vào được) -->
+            <div class="flex items-center space-x-4">
+                <a href="/profile" class="flex items-center space-x-2 hover:text-blue-600 transition-all">
+                    <span class="text-slate-600 font-medium" sec:authentication="name">Admin_Master</span>
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-sm">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-500">Tổng số xe</p>
+                <h3 class="text-4xl font-bold text-slate-800">24</h3>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-500">Doanh thu tháng</p>
+                <h3 class="text-4xl font-bold text-green-600">120M</h3>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-500">Tuyến hoạt động</p>
+                <h3 class="text-4xl font-bold text-blue-600">12</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>
