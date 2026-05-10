@@ -36,4 +36,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByStatus(TicketStatus status);
     // Dùng để kiểm tra nhanh trước khi lưu (Conflict Check)
     boolean existsByTripIdAndSeatId(Long tripId, Long seatId);
+
+    // Trong TicketRepository.java
+    @Query("SELECT t FROM Ticket t JOIN FETCH t.trip WHERE t.ticketCode = :code AND t.customerPhone = :phone")
+    Optional<Ticket> findByTicketCodeAndPhone(@Param("code") String code, @Param("phone") String phone);
 }
