@@ -10,8 +10,10 @@
 
 <main class="max-w-4xl mx-auto py-10 px-4">
     <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-slate-800" th:text="${trip.bus.busType}">Loại xe</h2>
-        <p class="text-slate-500 mt-2" th:text="${trip.route.departure.name + ' ➔ ' + trip.route.destination.name}"></p>
+<!--        <h2 class="text-3xl font-bold text-slate-800" th:text="${trip.bus.busType}">Loại xe</h2>-->
+<!--        <p class="text-slate-500 mt-2" th:text="${trip.route.departure.name + ' ➔ ' + trip.route.destination.name}"></p>-->
+        <h2 th:text="${trip?.bus?.busType ?: 'Loại xe'}"></h2>
+        <p th:text="${(trip?.route?.departure?.name ?: '...') + ' ➔ ' + (trip?.route?.destination?.name ?: '...')}"></p>
         <p class="text-sm font-medium text-orange-600" th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}"></p>
     </div>
 
@@ -20,15 +22,17 @@
         <div class="flex items-center"><div class="w-5 h-5 bg-blue-500 rounded mr-2"></div> Đang chọn</div>
         <div class="flex items-center"><div class="w-5 h-5 bg-slate-300 rounded mr-2"></div> Đã đặt</div>
     </div>
-
+    <p th:text="'Số lượng ghế: ' + ${seats.size()}"></p>
     <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
 
         <div th:if="${trip.bus.busType == 'Giường nằm'}" class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
                 <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Tầng dưới</h3>
                 <div class="grid grid-cols-3 gap-4 border-2 border-dashed border-slate-200 p-4 rounded-2xl">
-                    <th:block th:each="seat : ${seats}">
-                        <div th:if="${#strings.startsWith(seat.seatNumber, 'A')}" th:insert="~{::seat-fragment}"></div>
+
+                    <th:block th:each="sItem : ${seats}">
+                        <div th:if="${sItem != null and #strings.startsWith(sItem.seatNumber, 'A')}"
+                             th:insert="~{::seat-fragment(seatObj=${sItem})}"></div>
                     </th:block>
                 </div>
             </div>
@@ -36,8 +40,11 @@
             <div>
                 <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Tầng trên</h3>
                 <div class="grid grid-cols-3 gap-4 border-2 border-dashed border-slate-200 p-4 rounded-2xl">
-                    <th:block th:each="seat : ${seats}">
-                        <div th:if="${#strings.startsWith(seat.seatNumber, 'B')}" th:insert="~{::seat-fragment}"></div>
+
+                    <!-- Tầng trên -->
+                    <th:block th:each="sItem : ${seats}">
+                        <div th:if="${sItem != null and #strings.startsWith(sItem.seatNumber, 'B')}"
+                             th:insert="~{::seat-fragment(seatObj=${sItem})}"></div>
                     </th:block>
                 </div>
             </div>
@@ -47,28 +54,14 @@
         <div th:unless="${trip.bus.busType == 'Giường nằm'}" class="max-w-md mx-auto">
             <h3 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-widest text-xs">Sơ đồ ghế</h3>
 
-            <!-- Cải thiện grid: Tự động chia cột dựa trên loại xe -->
+
             <div class="grid gap-4 border-2 border-dashed border-slate-200 p-6 rounded-2xl"
                  th:classappend="${trip.bus.busType.contains('Limousine') ? 'grid-cols-3' : 'grid-cols-4'}">
 
-                <!-- QUAN TRỌNG: Lặp qua toàn bộ danh sách ghế -->
-                <th:block th:each="s : ${seats}">
-                    <div class="flex justify-center">
-                        <!-- Nút cho ghế đã đặt hoặc đang chờ -->
-                        <button th:if="${s.status?.toString() != 'AVAILABLE'}" disabled
-                                class="w-14 h-14 bg-slate-200 text-slate-400 rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
-                            <span th:text="${s.seatNumber}"></span>
-                        </button>
 
-                        <!-- Nút cho ghế còn trống -->
-                        <a th:if="${s.status?.toString() == 'AVAILABLE'}"
-                           th:href="@{/booking/confirm(tripId=${trip.id}, seatId=${s.id})}"
-                           class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl
-                          flex items-center justify-center hover:bg-blue-500 hover:text-white
-                          transition-all duration-200 font-bold shadow-sm active:scale-90">
-                            <span th:text="${s.seatNumber}"></span>
-                        </a>
-                    </div>
+                <th:block th:each="sItem : ${seats}">
+                    <div th:if="${sItem != null}"
+                         th:insert="~{::seat-fragment(seatObj=${sItem})}"></div>
                 </th:block>
             </div>
         </div>
@@ -85,24 +78,76 @@
     </div>
 </main>
 
-<div th:fragment="seat-fragment"  class="flex justify-center">
-    <th:block th:if="${seat != null}">
-        <button th:if="${seat.status?.toString() != 'AVAILABLE'}" disabled
-                class="w-14 h-14 bg-slate-200 text-slate-400 rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
-            <span th:text="${seat.seatNumber}"></span>
-        </button>
 
-        <a th:if="${seat.status?.toString() == 'AVAILABLE'}"
-           th:href="@{/booking/confirm(tripId=${trip.id}, seatId=${seat.id})}"
-           class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl
-                  flex items-center justify-center hover:bg-blue-500 hover:text-white
-                  transition-all duration-200 font-bold shadow-sm active:scale-90">
-            <span th:text="${seat.seatNumber}"></span>
-        </a>
-    </th:block>
+<div th:fragment="seat-fragment(seatObj)"
+     th:if="${seatObj != null}"
+     th:id="${'seat-container-' + seatObj.id}"
+     class="flex justify-center">
+
+    <!-- Nút cho ghế KHÔNG trống (PENDING hoặc BOOKED) -->
+    <button th:if="${seatObj.status != 'AVAILABLE'}"
+            disabled
+            th:classappend="${seatObj.status == 'PENDING' ? 'bg-blue-500 text-white' : 'bg-slate-300 text-slate-400'}"
+            class="w-14 h-14 rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+        <span th:text="${seatObj.seatNumber}"></span>
+    </button>
+
+    <!-- Nút cho ghế TRỐNG -->
+    <a th:if="${seatObj.status == 'AVAILABLE'}"
+       th:href="@{/booking/confirm(tripId=${trip.id}, seatId=${seatObj.id})}"
+       class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl
+              flex items-center justify-center hover:bg-blue-500 hover:text-white
+              transition-all duration-200 font-bold shadow-sm active:scale-90">
+        <span th:text="${seatObj.seatNumber}"></span>
+    </a>
 </div>
-
 <script>lucide.createIcons();</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 1. Đảm bảo tripId được lấy đúng từ Thymeleaf
+    const tripId = /*[[${trip.id}]]*/ 0;
 
+    function pollSeatStatus() {
+        // Bây giờ tripId đã tồn tại, fetch sẽ không bị lỗi nữa
+        fetch(`/api/seats/status/${tripId}`)
+            .then(res => res.json())
+            .then(seats => {
+                seats.forEach(seat => {
+                    // Tìm container dựa trên ID ghế
+                    const container = document.getElementById(`seat-container-${seat.id}`);
+                    if (!container) return;
+
+                    const currentLink = container.querySelector('a');
+                    const currentButton = container.querySelector('button');
+
+                    // Nếu trạng thái là PENDING hoặc BOOKED nhưng giao diện vẫn đang hiện thẻ <a> (ghế trống)
+                    if (seat.status !== 'AVAILABLE' && currentLink) {
+                        const colorClass = (seat.status === 'PENDING') ? 'bg-blue-500 text-white' : 'bg-slate-300 text-slate-400';
+
+                        container.innerHTML = `
+                            <button disabled class="w-14 h-14 ${colorClass} rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+                                <span>${seat.seatNumber}</span>
+                            </button>
+                        `;
+                    }
+
+                    // Nếu trạng thái quay lại AVAILABLE nhưng giao diện đang hiện nút khóa (button)
+                    else if (seat.status === 'AVAILABLE' && currentButton) {
+                        container.innerHTML = `
+                            <a href="/booking/confirm?tripId=${tripId}&seatId=${seat.id}"
+                               class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all duration-200 font-bold shadow-sm">
+                                <span>${seat.seatNumber}</span>
+                            </a>
+                        `;
+                    }
+                });
+            })
+            .catch(err => console.error("Lỗi cập nhật:", err));
+    }
+
+    // Chạy polling mỗi 3 giây
+    setInterval(pollSeatStatus, 3000);
+    /*]]>*/
+</script>
 </body>
 </html>

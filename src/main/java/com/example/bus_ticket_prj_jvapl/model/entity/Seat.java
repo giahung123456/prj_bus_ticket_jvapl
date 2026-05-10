@@ -29,5 +29,6 @@ public class Seat {
 
     @Version
     private Long version;
+    private LocalDateTime lockedAt;
 
 }

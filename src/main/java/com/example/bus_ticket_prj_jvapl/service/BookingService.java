@@ -27,42 +27,78 @@ public class BookingService {
      * CORE-06: Đặt vé & tính toàn vẹn dữ liệu
      * Sử dụng Pessimistic Lock để chống đặt trùng ghế
      */
+//    @Transactional(rollbackFor = Exception.class)
+//    public Ticket createBooking(BookingRequestDTO dto) {
+//
+//        // 1. SELECT seat ... FOR UPDATE (Khóa dòng này để tránh tranh chấp)
+//        // Sử dụng phương thức có Lock mà mình đã thêm vào Repository
+//        Seat seat = seatRepository.findByIdWithLock(dto.getSeatId())
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy ghế"));
+//
+//        // 2. Kiểm tra trạng thái ghế ngay sau khi khóa
+//        if (seat.getStatus() != SeatStatus.AVAILABLE) {
+//            throw new RuntimeException("Rất tiếc, ghế " + seat.getSeatNumber() + " đã có người khác nhanh tay đặt trước!");
+//        }
+//
+//        // 3. Tìm chuyến đi
+//        Trip trip = tripRepository.findById(dto.getTripId())
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi"));
+//
+//        // 4. Tạo Ticket (INSERT)
+//        Ticket ticket = Ticket.builder()
+//                .ticketCode("TCK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+//                .customerName(dto.getCustomerName())
+//                .customerPhone(dto.getCustomerPhone())
+//                .trip(trip)
+//                .seat(seat) // Gán trực tiếp Object Seat vào Ticket
+//                .totalPrice(trip.getPrice())
+//                .status(TicketStatus.PENDING)
+//                .createdAt(LocalDateTime.now())
+//                .build();
+//
+//        Ticket savedTicket = ticketRepository.save(ticket);
+//
+//        // 5. Cập nhật trạng thái ghế (UPDATE)
+//        seat.setStatus(SeatStatus.PENDING);
+//        seatRepository.save(seat);
+//
+//        // Trả về ticket đã lưu (Spring sẽ tự COMMIT tại đây)
+//        return savedTicket;
+//    }
     @Transactional(rollbackFor = Exception.class)
     public Ticket createBooking(BookingRequestDTO dto) {
-
-        // 1. SELECT seat ... FOR UPDATE (Khóa dòng này để tránh tranh chấp)
-        // Sử dụng phương thức có Lock mà mình đã thêm vào Repository
+        // 1. Khóa dòng dữ liệu ghế
         Seat seat = seatRepository.findByIdWithLock(dto.getSeatId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ghế"));
 
-        // 2. Kiểm tra trạng thái ghế ngay sau khi khóa
-        if (seat.getStatus() != SeatStatus.AVAILABLE) {
-            throw new RuntimeException("Rất tiếc, ghế " + seat.getSeatNumber() + " đã có người khác nhanh tay đặt trước!");
+        // 2. Kiểm tra trạng thái ghế (SeatStatus)
+        // Nếu ghế đã có người đặt chính thức (BOOKED) thì mới chặn
+        if (seat.getStatus() == SeatStatus.BOOKED) {
+            throw new RuntimeException("Rất tiếc, ghế " + seat.getSeatNumber() + " đã có người đặt!");
         }
 
-        // 3. Tìm chuyến đi
+        // 3. Lấy thông tin chuyến đi
         Trip trip = tripRepository.findById(dto.getTripId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi"));
 
-        // 4. Tạo Ticket (INSERT)
+        // 4. Tạo thực thể Ticket và dùng TicketStatus.BOOKED (đã thêm ở Bước 1)
         Ticket ticket = Ticket.builder()
                 .ticketCode("TCK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .customerName(dto.getCustomerName())
                 .customerPhone(dto.getCustomerPhone())
                 .trip(trip)
-                .seat(seat) // Gán trực tiếp Object Seat vào Ticket
+                .seat(seat)
                 .totalPrice(trip.getPrice())
-                .status(TicketStatus.PENDING)
+                .status(TicketStatus.BOOKED) // Sử dụng giá trị vừa thêm vào Enum
                 .createdAt(LocalDateTime.now())
                 .build();
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        // 5. Cập nhật trạng thái ghế (UPDATE)
-        seat.setStatus(SeatStatus.PENDING);
+        // 5. Cập nhật trạng thái Ghế thành BOOKED để người sau không chọn được nữa
+        seat.setStatus(SeatStatus.BOOKED);
         seatRepository.save(seat);
 
-        // Trả về ticket đã lưu (Spring sẽ tự COMMIT tại đây)
         return savedTicket;
     }
 }

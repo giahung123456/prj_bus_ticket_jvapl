@@ -1,15 +1,14 @@
 package com.example.bus_ticket_prj_jvapl.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Data
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class BookingRequestDTO {
     private Long tripId;

@@ -33,9 +33,14 @@
                     <p class="font-medium" th:text="${trip.route.departure.name + ' ➔ ' + trip.route.destination.name}">Hà Nội ➔ Hải Phòng</p>
                     <p class="text-blue-100" th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}">08:00 - 10/05/2026</p>
                 </div>
+<!--                <div class="text-right">-->
+<!--                    <p class="text-xs uppercase tracking-wider text-blue-200">Ghế đã chọn</p>-->
+<!--&lt;!&ndash;                    <p class="text-lg font-bold" th:text="${seatNumber}">A12</p>&ndash;&gt;-->
+<!--                    <p class="text-lg font-bold" th:text="${seat.seatNumber}">A12</p>-->
+<!--                </div>-->
                 <div class="text-right">
                     <p class="text-xs uppercase tracking-wider text-blue-200">Ghế đã chọn</p>
-                    <p class="text-lg font-bold" th:text="${seatNumber}">A12</p>
+                    <p class="text-lg font-bold" th:text="${seat.seatNumber}">A12</p> <!-- Sửa từ seatNumber thành seat.seatNumber -->
                 </div>
             </div>
         </div>
@@ -44,7 +49,8 @@
         <form th:action="@{/book-ticket}" method="post" class="p-8 space-y-6">
             <!-- Hidden Fields -->
             <input type="hidden" name="tripId" th:value="${trip.id}">
-            <input type="hidden" name="seatId" th:value="${seatId}">
+            <!-- Trong file confirm-booking.html -->
+            <input type="hidden" name="seatId" th:value="${seat.id}">
 
             <div class="space-y-4">
                 <!-- Trường Họ Tên -->
@@ -87,6 +93,13 @@
                     <i data-lucide="check-circle" class="mr-2 w-5 h-5"></i>
                     Xác nhận đặt vé ngay
                 </button>
+                <div class="mt-4 text-center">
+                    <a th:href="@{/booking/cancel-selection(tripId=${trip.id}, seatId=${seat.id})}"
+                       class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors">
+                        <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i>
+                        Chọn lại ghế khác (Hủy giữ chỗ)
+                    </a>
+                </div>
 
                 <p class="text-center text-xs text-slate-400 mt-4 px-4">
                     Bằng cách nhấn xác nhận, bạn đồng ý với các điều khoản và chính sách bảo mật của chúng tôi.

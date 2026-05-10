@@ -17,7 +17,9 @@
                 <a href="/profile" class="flex items-center hover:text-orange-200 transition"><i data-lucide="user-cog" class="w-4 h-4 mr-1"></i> Cá nhân</a>
                 <a href="/logout" class="bg-white text-blue-600 px-5 py-2 rounded-full font-bold shadow-lg hover:bg-blue-50 transition">Đăng xuất</a>
             </th:block>
-
+            <a href="/tickets/lookup" class="flex items-center hover:text-orange-200 transition">
+                <i data-lucide="search" class="w-4 h-4 mr-1"></i> Tra cứu vé
+            </a>
             <th:block th:if="${session.loggedInUser == null}">
                 <a href="/login" class="bg-orange-400 text-white px-5 py-2 rounded-full font-bold shadow-lg hover:bg-orange-500 transition">Đăng nhập</a>
             </th:block>

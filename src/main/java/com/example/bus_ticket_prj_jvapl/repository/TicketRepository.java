@@ -1,17 +1,32 @@
 package com.example.bus_ticket_prj_jvapl.repository;
 
+import com.example.bus_ticket_prj_jvapl.model.dto.TicketDetailDTO;
 import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     // Tìm danh sách vé của chuyến để check xem ghế nào đã được bán
     List<Ticket> findByTripId(Long tripId);
-
+    @Query("SELECT new com.example.bus_ticket_prj_jvapl.model.dto.TicketDetailDTO(" +
+            "t.ticketCode, t.customerName, t.customerPhone, s.seatNumber, " +
+            "b.plateNumber, r.departure.name, r.destination.name, " +
+            "tr.departureTime, t.status, t.totalPrice) " +
+            "FROM Ticket t " +
+            "JOIN t.seat s " +
+            "JOIN t.trip tr " +
+            "JOIN tr.route r " +
+            "JOIN tr.bus b " +
+            "WHERE t.ticketCode = :code AND t.customerPhone = :phone")
+    Optional<TicketDetailDTO> findTicketDetail(@Param("code") String code,
+                                               @Param("phone") String phone);
     // Dùng để kiểm tra nhanh trước khi lưu (Conflict Check)
     boolean existsByTripIdAndSeatId(Long tripId, Long seatId);
 }
