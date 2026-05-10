@@ -2,6 +2,7 @@ package com.example.bus_ticket_prj_jvapl.repository;
 
 import com.example.bus_ticket_prj_jvapl.model.dto.TicketDetailDTO;
 import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
+import com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,6 +28,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             "WHERE t.ticketCode = :code AND t.customerPhone = :phone")
     Optional<TicketDetailDTO> findTicketDetail(@Param("code") String code,
                                                @Param("phone") String phone);
+    List<Ticket> findByStatus(TicketStatus status);
     // Dùng để kiểm tra nhanh trước khi lưu (Conflict Check)
     boolean existsByTripIdAndSeatId(Long tripId, Long seatId);
 }
