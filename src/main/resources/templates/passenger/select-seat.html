@@ -107,44 +107,77 @@
     // 1. Đảm bảo tripId được lấy đúng từ Thymeleaf
     const tripId = /*[[${trip.id}]]*/ 0;
 
+    // function pollSeatStatus() {
+    //     // Bây giờ tripId đã tồn tại, fetch sẽ không bị lỗi nữa
+    //     fetch(`/api/seats/status/${tripId}`)
+    //         .then(res => res.json())
+    //         .then(seats => {
+    //             seats.forEach(seat => {
+    //                 // Tìm container dựa trên ID ghế
+    //                 const container = document.getElementById(`seat-container-${seat.id}`);
+    //                 if (!container) return;
+    //
+    //                 const currentLink = container.querySelector('a');
+    //                 const currentButton = container.querySelector('button');
+    //
+    //                 // Nếu trạng thái là PENDING hoặc BOOKED nhưng giao diện vẫn đang hiện thẻ <a> (ghế trống)
+    //                 if (seat.status !== 'AVAILABLE' && currentLink) {
+    //                     const colorClass = (seat.status === 'PENDING') ? 'bg-blue-500 text-white' : 'bg-slate-300 text-slate-400';
+    //
+    //                     container.innerHTML = `
+    //                         <button disabled class="w-14 h-14 ${colorClass} rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+    //                             <span>${seat.seatNumber}</span>
+    //                         </button>
+    //                     `;
+    //                 }
+    //
+    //                 // Nếu trạng thái quay lại AVAILABLE nhưng giao diện đang hiện nút khóa (button)
+    //                 else if (seat.status === 'AVAILABLE' && currentButton) {
+    //                     container.innerHTML = `
+    //                         <a href="/booking/confirm?tripId=${tripId}&seatId=${seat.id}"
+    //                            class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all duration-200 font-bold shadow-sm">
+    //                             <span>${seat.seatNumber}</span>
+    //                         </a>
+    //                     `;
+    //                 }
+    //             });
+    //         })
+    //         .catch(err => console.error("Lỗi cập nhật:", err));
+    // }
     function pollSeatStatus() {
-        // Bây giờ tripId đã tồn tại, fetch sẽ không bị lỗi nữa
         fetch(`/api/seats/status/${tripId}`)
             .then(res => res.json())
             .then(seats => {
                 seats.forEach(seat => {
-                    // Tìm container dựa trên ID ghế
                     const container = document.getElementById(`seat-container-${seat.id}`);
                     if (!container) return;
 
-                    const currentLink = container.querySelector('a');
-                    const currentButton = container.querySelector('button');
-
-                    // Nếu trạng thái là PENDING hoặc BOOKED nhưng giao diện vẫn đang hiện thẻ <a> (ghế trống)
-                    if (seat.status !== 'AVAILABLE' && currentLink) {
-                        const colorClass = (seat.status === 'PENDING') ? 'bg-blue-500 text-white' : 'bg-slate-300 text-slate-400';
-
-                        container.innerHTML = `
-                            <button disabled class="w-14 h-14 ${colorClass} rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
-                                <span>${seat.seatNumber}</span>
-                            </button>
-                        `;
-                    }
-
-                    // Nếu trạng thái quay lại AVAILABLE nhưng giao diện đang hiện nút khóa (button)
-                    else if (seat.status === 'AVAILABLE' && currentButton) {
-                        container.innerHTML = `
+                    // 1. Nếu ghế quay lại AVAILABLE (Trường hợp bị hủy vé)
+                    if (seat.status === 'AVAILABLE') {
+                        if (container.querySelector('button')) { // Nếu đang hiện nút khóa
+                            container.innerHTML = `
                             <a href="/booking/confirm?tripId=${tripId}&seatId=${seat.id}"
                                class="w-14 h-14 bg-white border-2 border-blue-500 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all duration-200 font-bold shadow-sm">
                                 <span>${seat.seatNumber}</span>
-                            </a>
-                        `;
+                            </a>`;
+                        }
+                    }
+                    // 2. Nếu ghế là PENDING hoặc BOOKED (Cần khóa hoặc đổi màu)
+                    else {
+                        const colorClass = (seat.status === 'PENDING') ? 'bg-blue-500 text-white' : 'bg-slate-300 text-slate-400';
+                        const currentButton = container.querySelector('button');
+
+                        // Nếu chưa có nút bấm hoặc ĐÃ CÓ NÚT BẤM NHƯNG SAI MÀU (đổi từ PENDING sang BOOKED)
+                        if (!currentButton || !currentButton.classList.contains(seat.status === 'PENDING' ? 'bg-blue-500' : 'bg-slate-300')) {
+                            container.innerHTML = `
+                            <button disabled class="w-14 h-14 ${colorClass} rounded-xl cursor-not-allowed flex items-center justify-center font-bold">
+                                <span>${seat.seatNumber}</span>
+                            </button>`;
+                        }
                     }
                 });
-            })
-            .catch(err => console.error("Lỗi cập nhật:", err));
+            });
     }
-
     // Chạy polling mỗi 3 giây
     setInterval(pollSeatStatus, 3000);
     /*]]>*/

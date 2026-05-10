@@ -36,7 +36,7 @@ public class AuthController {
         }
         // Điều hướng dựa trên Role nếu đã đăng nhập
         if ("ADMIN".equals(user.getRole().name())) return "redirect:/admin/index";
-        if ("STAFF".equals(user.getRole().name())) return "redirect:/staff/index";
+        if ("STAFF".equals(user.getRole().name())) return "redirect:/staff/tickets";
         return "passenger/home";
     }
     private void loadSearchData(Model model) {

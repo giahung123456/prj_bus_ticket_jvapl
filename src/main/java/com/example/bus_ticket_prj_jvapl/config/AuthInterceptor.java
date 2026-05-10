@@ -24,9 +24,20 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 // Nếu vào trang staff mà không phải role STAFF/ADMIN thì chặn
-        if (uri.startsWith("/staff") && !user.getRole().name().equals("STAFF") && !user.getRole().name().equals("ADMIN")) {
-            response.sendRedirect("/access-denied");
-            return false;
+//        if (uri.startsWith("/staff") && !user.getRole().name().equals("STAFF") && !user.getRole().name().equals("ADMIN")) {
+//            response.sendRedirect("/access-denied");
+//            return false;
+//        }
+        
+        // Trong AuthInterceptor.java
+
+
+// Đảm bảo /staff hoặc /staff/ đều bị kiểm tra
+        if (uri.equals("/staff") || uri.startsWith("/staff/")) {
+            if (!user.getRole().name().equals("STAFF") && !user.getRole().name().equals("ADMIN")) {
+                response.sendRedirect("/access-denied");
+                return false;
+            }
         }
         return true;
     }

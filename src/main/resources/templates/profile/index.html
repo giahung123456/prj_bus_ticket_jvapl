@@ -15,7 +15,7 @@
             </h2>
             <th:block th:if="${session.loggedInUser != null}">
                 <a th:href="${session.loggedInUser.role.name() == 'ADMIN' ? '/admin/index' :
-             (session.loggedInUser.role.name() == 'STAFF' ? '/staff/index' : '/passenger/home')}"
+             (session.loggedInUser.role.name() == 'STAFF' ? '/staff/tickets' : '/')}"
                    class="text-sm bg-blue-700 px-3 py-1 rounded-lg hover:bg-blue-800 transition">
                     Quay lại
                 </a>

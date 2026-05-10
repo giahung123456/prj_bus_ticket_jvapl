@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/admin/**", "/staff/**", "/profile/**") // Những link cần bảo vệ
+                .addPathPatterns("/admin/**", "/staff/**","/staff", "/profile/**") // Những link cần bảo vệ
                 .excludePathPatterns("/login", "/register", "/css/**", "/js/**"); // Những link cho phép tự do
     }
     @Bean

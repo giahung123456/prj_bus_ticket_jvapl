@@ -25,7 +25,7 @@ public class PaymentService {
     @Transactional
     public void confirmPayment(Long ticketId) {
         // 1. SELECT FOR UPDATE để tránh xung đột dữ liệu
-        Ticket ticket = ticketRepository.findById(ticketId)
+        Ticket ticket = ticketRepository.findByIdWithLock(ticketId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vé"));
 
         if (ticket.getStatus() != TicketStatus.PENDING) {

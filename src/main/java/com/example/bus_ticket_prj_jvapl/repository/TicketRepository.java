@@ -3,7 +3,9 @@ package com.example.bus_ticket_prj_jvapl.repository;
 import com.example.bus_ticket_prj_jvapl.model.dto.TicketDetailDTO;
 import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
 import com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     // Tìm danh sách vé của chuyến để check xem ghế nào đã được bán
     List<Ticket> findByTripId(Long tripId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Ticket t WHERE t.id = :id")
+    Optional<Ticket> findByIdWithLock(@Param("id") Long id);
     @Query("SELECT new com.example.bus_ticket_prj_jvapl.model.dto.TicketDetailDTO(" +
             "t.ticketCode, t.customerName, t.customerPhone, s.seatNumber, " +
             "b.plateNumber, r.departure.name, r.destination.name, " +
