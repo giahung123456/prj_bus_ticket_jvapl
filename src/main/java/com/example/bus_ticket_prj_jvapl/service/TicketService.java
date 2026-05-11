@@ -53,4 +53,10 @@ public class TicketService {
         seat.setStatus(SeatStatus.AVAILABLE);
         seatRepository.save(seat);
     }
+    public Double calculateMonthlyRevenue() {
+        // Gọi hàm từ Repository (Hàm này bạn đã viết ở bước Hướng 4 trước đó)
+        // Nếu chưa viết, hãy đảm bảo TicketRepository có hàm tính tổng tiền theo tháng
+        Double revenue = ticketRepository.getTotalRevenueThisMonth();
+        return (revenue != null) ? revenue : 0.0;
+    }
 }
