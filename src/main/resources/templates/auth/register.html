@@ -1,59 +1,110 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | BusTicket</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Đăng Ký Tài Khoản</h2>
-
-    <form th:action="@{/register}" th:object="${user}" method="post" class="space-y-4">
-
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
-            <input type="text" th:field="*{username}"
-
-                   class="mt-1 block w-full border rounded-md p-2 outline-none focus:ring-2 focus:ring-blue-500"
-                   th:classappend="${#fields.hasErrors('username')} ? 'border-red-500 shadow-sm' : 'border-gray-300'">
-
-            <p class="text-red-500 text-xs mt-1 font-semibold"
-               th:if="${#fields.hasErrors('username')}"
-               th:errors="*{username}"></p>
-        </div>
-        <!-- Password -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
-            <input type="password" th:field="*{password}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+<body class="bg-slate-50">
+<div class="min-h-screen flex flex-row-reverse">
+    <div class="hidden lg:flex lg:w-5/12 bg-orange-500 relative items-center justify-center p-12 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&q=80&w=2071"
+                 class="w-full h-full object-cover opacity-40" alt="Road background">
+            <div class="absolute inset-0 bg-gradient-to-br from-orange-600 via-transparent to-orange-900"></div>
         </div>
 
-        <!-- Full Name -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Họ và tên</label>
-            <input type="text" th:field="*{fullName}"
-
-                   class="mt-1 block w-full border rounded-md p-2">
-            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
+        <div class="relative z-10 text-white max-w-sm text-center">
+            <h1 class="text-4xl font-extrabold mb-6">Trở thành thành viên của chúng tôi.</h1>
+            <p class="text-orange-50 text-lg">Tiết kiệm 20% cho chuyến đi đầu tiên sau khi đăng ký thành công!</p>
         </div>
+    </div>
 
+    <div class="w-full lg:w-7/12 flex items-center justify-center p-8 bg-white">
+        <div class="w-full max-w-lg">
+            <div class="mb-8">
+                <a href="/" class="inline-flex items-center text-blue-600 font-semibold mb-6 hover:gap-2 transition-all">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Trang chủ
+                </a>
+                <h2 class="text-3xl font-bold text-slate-800">Tạo tài khoản mới</h2>
+                <p class="text-slate-500 mt-2">Chỉ mất chưa đầy một phút để bắt đầu.</p>
+            </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
-            <input type="text" th:field="*{phoneNumber}"
-                   class="mt-1 block w-full border rounded-md p-2 outline-none focus:ring-2 focus:ring-blue-500"
-                   th:classappend="${#fields.hasErrors('phoneNumber')} ? 'border-red-500' : 'border-gray-300'">
-            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></p>
+            <form th:action="@{/register}" th:object="${user}" method="post" autocomplete="off" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div th:if="${#fields.hasGlobalErrors()}" class="md:col-span-2 mb-2 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-xl">
+                    <div th:each="err : ${#fields.globalErrors()}" class="flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        <span th:text="${err}">Lỗi hệ thống</span>
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tên đăng nhập</label>
+<!--                    <input type="text" th:field="*{username}" placeholder="user123"-->
+<!--                           autocomplete="off"-->
+<!--                           class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"-->
+<!--                           th:classappend="${#fields.hasErrors('username')} ? 'border-red-500' : ''">-->
+                    <input type="text" th:field="*{username}" placeholder="user123"
+                           autocomplete="off"
+                           class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                           th:classappend="${#fields.hasErrors('username')} ? 'border-red-500 bg-red-50' : ''">
+                    <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Mật khẩu</label>
+<!--                    <input type="password" th:field="*{password}" placeholder="••••••••"-->
+<!--                           autocomplete="new-password"-->
+<!--                           class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"-->
+<!--                           th:classappend="${#fields.hasErrors('password')} ? 'border-red-500' : ''">-->
+                    <input type="password" th:field="*{password}" placeholder="••••••••"
+                           autocomplete="new-password"
+                           class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                           th:classappend="${#fields.hasErrors('password')} ? 'border-red-500 bg-red-50' : ''">
+                    <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Số điện thoại</label>
+                    <div class="relative">
+                        <input type="text" th:field="*{phoneNumber}" placeholder="0987xxxxxx"
+                               autocomplete="none"
+                               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                               th:classappend="${#fields.hasErrors('phoneNumber')} ? 'border-red-500 bg-red-50' : ''">
+                    </div>
+
+                    <p class="text-red-500 text-xs mt-1 font-medium flex items-center gap-1"
+                       th:if="${#fields.hasErrors('phoneNumber')}">
+                        <i data-lucide="info" class="w-3 h-3"></i>
+                        <span th:errors="*{phoneNumber}">Số điện thoại đã tồn tại</span>
+                    </p>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Họ và tên</label>
+                    <input type="text" th:field="*{fullName}" placeholder="Nguyễn Văn A"
+                           autocomplete="none"
+                           class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                           th:classappend="${#fields.hasErrors('fullName')} ? 'border-red-500 bg-red-50' : ''">
+                    <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
+                </div>
+
+                <div class="md:col-span-2 pt-4">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all">
+                        Tạo tài khoản
+                    </button>
+                </div>
+            </form>
+
+            <p class="mt-8 text-center text-slate-600">
+                Đã có tài khoản? <a href="/login" class="text-blue-600 font-bold hover:underline">Đăng nhập</a>
+            </p>
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200">Đăng Ký</button>
-    </form>
-
-    <p class="mt-4 text-center text-sm text-gray-600">
-        Đã có tài khoản? <a href="/login" class="text-blue-600 hover:underline">Đăng nhập ngay</a>
-    </p>
+    </div>
 </div>
+<script>lucide.createIcons();</script>
 </body>
-
 </html>

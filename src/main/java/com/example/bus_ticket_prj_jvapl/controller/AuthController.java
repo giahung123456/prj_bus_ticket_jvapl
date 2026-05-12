@@ -86,21 +86,37 @@ public class AuthController {
     public String registerUser(@Valid @ModelAttribute("user") UserRegistrationDTO dto,
                                BindingResult result,
                                RedirectAttributes redirectAttributes) {
-        // 1. Kiểm tra trùng tên đăng nhập trước (ngay cả khi các ô khác trống)
-        try {
-            // Ta có thể gọi một hàm checkUsername riêng hoặc để try-catch bao quanh toàn bộ
-            userService.checkDuplicateUsername(dto.getUsername());
-        } catch (RuntimeException e) {
-            result.rejectValue("username", "duplicate", e.getMessage());
+
+        // 1. Check trùng Username (nếu username không trống)
+        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+            try {
+                userService.checkDuplicateUsername(dto.getUsername());
+            } catch (RuntimeException e) {
+                result.rejectValue("username", "duplicate", e.getMessage());
+            }
         }
-        if (result.hasErrors()) return "auth/register";
+
+        // 2. Check trùng Số điện thoại (nếu SĐT không trống)
+        if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().isBlank()) {
+            try {
+                userService.checkDuplicatePhone(dto.getPhoneNumber());
+            } catch (RuntimeException e) {
+                result.rejectValue("phoneNumber", "duplicate", e.getMessage());
+            }
+        }
+
+        // 3. TỔNG KIỂM TRA: Nếu có bất kỳ lỗi nào (trống hoặc trùng) thì hiện hết ra
+        if (result.hasErrors()) {
+            return "auth/register";
+        }
+
+        // 4. Nếu sạch lỗi thì mới tiến hành lưu vào DB
         try {
             userService.registerPassenger(dto);
             redirectAttributes.addFlashAttribute("successMsg", "Đăng ký thành công!");
             return "redirect:/login";
         } catch (RuntimeException e) {
-//            result.rejectValue("username", "error.user", e.getMessage());
-            result.rejectValue("username", "duplicate", e.getMessage());
+            result.reject("globalError", "Có lỗi xảy ra trong quá trình đăng ký.");
             return "auth/register";
         }
     }

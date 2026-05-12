@@ -27,7 +27,10 @@ public void registerPassenger(UserRegistrationDTO dto) {
     if (userRepository.findByUsername(dto.getUsername()) != null) {
         throw new RuntimeException("Tên đăng nhập '" + dto.getUsername() + "' đã tồn tại!");
     }
-
+// 2. KIỂM TRA SỐ ĐIỆN THOẠI (MỚI THÊM)
+    if (userRepository.findByPhoneNumber(dto.getPhoneNumber()) != null) {
+        throw new RuntimeException("Số điện thoại '" + dto.getPhoneNumber() + "' đã được sử dụng bởi tài khoản khác!");
+    }
     // 2. Kiểm soát truy cập: Luôn gán Role là PASSENGER cho luồng đăng ký công khai
     // Ngay cả khi DTO gửi lên Role khác, chúng ta vẫn ghi đè để bảo mật
     Role finalRole = Role.PASSENGER;
@@ -127,6 +130,11 @@ public void registerPassenger(UserRegistrationDTO dto) {
     public void checkDuplicateUsername(String username) {
         if (userRepository.findByUsername(username) != null) {
             throw new RuntimeException("Tên đăng nhập '" + username + "' đã tồn tại!");
+        }
+    }
+    public void checkDuplicatePhone(String phoneNumber) {
+        if (phoneNumber != null && userRepository.findByPhoneNumber(phoneNumber) != null) {
+            throw new RuntimeException("Số điện thoại này đã được sử dụng!");
         }
     }
 }
