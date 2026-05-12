@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TicketService {
@@ -59,4 +60,5 @@ public class TicketService {
         Double revenue = ticketRepository.getTotalRevenueThisMonth();
         return (revenue != null) ? revenue : 0.0;
     }
+
 }

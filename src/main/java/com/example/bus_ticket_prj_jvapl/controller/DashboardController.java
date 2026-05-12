@@ -45,4 +45,5 @@ public class DashboardController {
 
     @GetMapping("/staff/index") public String staff() { return "staff/index"; }
     @GetMapping("/passenger/home") public String passenger() { return "passenger/home"; }
+
 }

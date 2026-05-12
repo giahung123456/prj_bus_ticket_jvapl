@@ -11,19 +11,7 @@
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Đăng Ký Tài Khoản</h2>
 
     <form th:action="@{/register}" th:object="${user}" method="post" class="space-y-4">
-        <!-- Username -->
-<!--        <div>-->
-<!--            <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>-->
-<!--            <input type="text" th:field="*{username}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">-->
-<!--            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--            <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>-->
-<!--            <input type="text" th:field="*{username}"-->
-<!--                   class="mt-1 block w-full border rounded-md p-2"-->
-<!--                   th:classappend="${#fields.hasErrors('username')} ? 'border-red-500' : 'border-gray-300'">-->
-<!--            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>-->
-<!--        </div>-->
+
         <div>
             <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
             <input type="text" th:field="*{username}"
@@ -51,11 +39,7 @@
             <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
         </div>
 
-        <!-- Phone -->
-<!--        <div>-->
-<!--            <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>-->
-<!--            <input type="text" th:field="*{phoneNumber}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">-->
-<!--        </div>-->
+
         <div>
             <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
             <input type="text" th:field="*{phoneNumber}"

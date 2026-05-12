@@ -1,11 +1,15 @@
 package com.example.bus_ticket_prj_jvapl.controller;
 
 import com.example.bus_ticket_prj_jvapl.model.entity.Seat;
+import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
 import com.example.bus_ticket_prj_jvapl.model.entity.Trip;
+import com.example.bus_ticket_prj_jvapl.model.entity.User;
 import com.example.bus_ticket_prj_jvapl.model.entity.enums.SeatStatus;
 import com.example.bus_ticket_prj_jvapl.repository.SeatRepository;
+import com.example.bus_ticket_prj_jvapl.repository.TicketRepository;
 import com.example.bus_ticket_prj_jvapl.repository.TripRepository;
 import com.example.bus_ticket_prj_jvapl.service.SeatService;
+import com.example.bus_ticket_prj_jvapl.service.TicketService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +31,7 @@ public class BookingController {
     private SeatService seatService;
     @Autowired private TripRepository tripRepository;
     @Autowired private SeatRepository seatRepository;
+
    // Tiêm Repository vào đây
     // Bước 1: Hiển thị sơ đồ ghế sau khi khách chọn chuyến
     @GetMapping("/select-seat")
@@ -59,26 +64,7 @@ public class BookingController {
             return "redirect:/?error";
         }
     }
-    // Trong BookingController.java
 
-//    @GetMapping("/confirm")
-//    public String confirmBooking(@RequestParam Long tripId,
-//                                 @RequestParam Long seatId,
-//                                 Model model) {
-//        // 1. Lấy thông tin chuyến đi từ database
-//        Trip trip = tripRepository.findById(tripId).orElse(null);
-//
-//        // 2. Lấy thông tin ghế từ database (bạn có thể dùng SeatRepository)
-//        // Giả sử bạn inject SeatRepository vào controller này
-//        // Seat seat = seatRepository.findById(seatId).orElse(null);
-//
-//        // 3. Truyền dữ liệu sang trang xác nhận
-//        model.addAttribute("trip", trip);
-//        model.addAttribute("seatId", seatId);
-//
-//        // 4. Trả về trang giao diện xác nhận thông tin (bạn cần tạo file này)
-//        return "passenger/confirm-booking";
-//    }
 @GetMapping("/confirm")
 @Transactional // Quan trọng để đảm bảo tính toàn vẹn dữ liệu
 public String confirmBooking(@RequestParam Long tripId, @RequestParam Long seatId, Model model) {
@@ -111,4 +97,5 @@ public String confirmBooking(@RequestParam Long tripId, @RequestParam Long seatI
         }
         return "redirect:/booking/select-seat?tripId=" + tripId;
     }
+
 }
