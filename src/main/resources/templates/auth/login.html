@@ -37,7 +37,7 @@
         <p class="text-slate-500 mt-2">Vui lòng nhập thông tin để truy cập tài khoản.</p>
       </div>
 
-      <div th:if="${error}" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm" th:text="${error}"></div>
+
       <div th:if="${successMsg}" class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm" th:text="${successMsg}"></div>
       <div th:if="${param.error}" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">Sai tài khoản hoặc mật khẩu!</div>
       <div th:if="${error}" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center gap-2">

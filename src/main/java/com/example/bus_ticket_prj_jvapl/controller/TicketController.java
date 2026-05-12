@@ -2,7 +2,12 @@ package com.example.bus_ticket_prj_jvapl.controller;
 
 import com.example.bus_ticket_prj_jvapl.model.dto.BookingRequestDTO;
 import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
+import com.example.bus_ticket_prj_jvapl.model.entity.User;
+import com.example.bus_ticket_prj_jvapl.model.entity.UserProfile;
+import com.example.bus_ticket_prj_jvapl.repository.SeatRepository;
+import com.example.bus_ticket_prj_jvapl.repository.TripRepository;
 import com.example.bus_ticket_prj_jvapl.service.BookingService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,28 +20,55 @@ public class TicketController {
 
     @Autowired
     private BookingService bookingService;
-
+    @Autowired private TripRepository tripRepository;
+    @Autowired private SeatRepository seatRepository;
     @PostMapping("/book-ticket")
-    public String processBooking(@ModelAttribute BookingRequestDTO dto, RedirectAttributes ra) {
-        try {
-            // ĐẶT LOG TẠI ĐÂY
-            System.err.println("--- DEBUG BOOKING ---");
-            System.err.println("Trip ID gửi lên: " + dto.getTripId());
-            System.err.println("Seat ID gửi lên: " + dto.getSeatId()); // Nếu cái này null là lỗi do HTML
-            System.err.println("Tên khách: " + dto.getCustomerName());
-            // Truyền thẳng object dto vào service
-            Ticket ticket = bookingService.createBooking(dto);
+    public String processBooking(@ModelAttribute BookingRequestDTO dto,
+                                 HttpSession session,
+                                 Model model) {
 
-            ra.addFlashAttribute("successMsg", "Đặt chỗ thành công! Mã vé: " + ticket.getTicketCode());
+        User user = (User) session.getAttribute("loggedInUser");
+        UserProfile profile = user.getProfile();
+        boolean hasError = false;
+
+        // --- KIỂM TRA HỌ TÊN ---
+        if (dto.getCustomerName() == null || dto.getCustomerName().trim().isEmpty()) {
+            model.addAttribute("errorName", "Họ tên không được để trống!");
+            hasError = true;
+        }
+        // Nếu đã nhập rồi thì mới kiểm tra xem có trùng tài khoản không
+        else if (!dto.getCustomerName().trim().equalsIgnoreCase(profile.getFullName())) {
+            model.addAttribute("errorName", "Họ tên phải trùng khớp với thông tin tài khoản!");
+            hasError = true;
+        }
+
+        // --- KIỂM TRA SỐ ĐIỆN THOẠI ---
+        if (dto.getCustomerPhone() == null || dto.getCustomerPhone().trim().isEmpty()) {
+            model.addAttribute("errorPhone", "Số điện thoại không được để trống!");
+            hasError = true;
+        }
+        // Nếu đã nhập rồi thì mới kiểm tra xem có trùng tài khoản không
+        else if (!dto.getCustomerPhone().trim().equals(profile.getPhoneNumber())) {
+            model.addAttribute("errorPhone", "Số điện thoại phải trùng khớp với thông tin tài khoản!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            model.addAttribute("profile", profile);
+            model.addAttribute("trip", tripRepository.findById(dto.getTripId()).orElse(null));
+            model.addAttribute("seat", seatRepository.findById(dto.getSeatId()).orElse(null));
+
+            model.addAttribute("customerName", dto.getCustomerName());
+            model.addAttribute("customerPhone", dto.getCustomerPhone());
+
+            return "passenger/confirm-booking";
+        }
+
+        try {
+            Ticket ticket = bookingService.createBooking(dto);
             return "redirect:/passenger/success/" + ticket.getTicketCode();
         } catch (Exception e) {
-            // LOG LỖI CHI TIẾT
-            System.err.println("LỖI KHI ĐẶT VÉ: " + e.getMessage());
-            e.printStackTrace();
-            ra.addFlashAttribute("error", e.getMessage());
-            // Quay lại trang chọn ghế của chuyến đi đó
-//            return "redirect:/passenger/select-seat?tripId=" + dto.getTripId();
-            return "redirect:/booking/select-seat?tripId=" + dto.getTripId();
+            return "redirect:/booking/select-seat?tripId=" + dto.getTripId() + "&error=" + e.getMessage();
         }
     }
     // Trong BookingController.java hoặc TicketController.java

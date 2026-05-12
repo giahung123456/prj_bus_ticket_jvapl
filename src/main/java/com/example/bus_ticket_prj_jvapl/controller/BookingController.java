@@ -1,9 +1,6 @@
 package com.example.bus_ticket_prj_jvapl.controller;
 
-import com.example.bus_ticket_prj_jvapl.model.entity.Seat;
-import com.example.bus_ticket_prj_jvapl.model.entity.Ticket;
-import com.example.bus_ticket_prj_jvapl.model.entity.Trip;
-import com.example.bus_ticket_prj_jvapl.model.entity.User;
+import com.example.bus_ticket_prj_jvapl.model.entity.*;
 import com.example.bus_ticket_prj_jvapl.model.entity.enums.SeatStatus;
 import com.example.bus_ticket_prj_jvapl.repository.SeatRepository;
 import com.example.bus_ticket_prj_jvapl.repository.TicketRepository;
@@ -67,8 +64,23 @@ public class BookingController {
 
 @GetMapping("/confirm")
 @Transactional // Quan trọng để đảm bảo tính toàn vẹn dữ liệu
-public String confirmBooking(@RequestParam Long tripId, @RequestParam Long seatId, Model model) {
-    // 1. Tìm ghế với cơ chế PESSIMISTIC_WRITE để tránh 2 người cùng nhấn 1 lúc
+public String confirmBooking(@RequestParam Long tripId, @RequestParam Long seatId,HttpSession session, Model model) {
+    // 1. Lấy User từ session
+    User user = (User) session.getAttribute("loggedInUser");
+    if (user == null) {
+        return "redirect:/login";
+    }
+
+    // 2. Lấy Profile từ User
+    UserProfile profile = user.getProfile();
+
+    // 3. Kiểm tra bắt buộc: Nếu profile null hoặc thiếu thông tin thì báo lỗi
+    if (profile == null || profile.getFullName() == null || profile.getPhoneNumber() == null
+            || profile.getFullName().isBlank() || profile.getPhoneNumber().isBlank()) {
+        // Bạn có thể redirect về trang cập nhật thông tin cá nhân
+        return "redirect:/passenger/profile?error=require_info";
+    }
+        // 1. Tìm ghế với cơ chế PESSIMISTIC_WRITE để tránh 2 người cùng nhấn 1 lúc
     Seat seat = seatRepository.findByIdWithLock(seatId)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy ghế"));
 
@@ -84,6 +96,7 @@ public String confirmBooking(@RequestParam Long tripId, @RequestParam Long seatI
 
     model.addAttribute("trip", tripRepository.findById(tripId).orElse(null));
     model.addAttribute("seat", seat);
+    model.addAttribute("profile", profile);
     return "passenger/confirm-booking";
 }
     @GetMapping("/cancel-selection")

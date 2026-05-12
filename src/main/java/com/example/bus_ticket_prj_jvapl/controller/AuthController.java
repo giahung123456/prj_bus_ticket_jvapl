@@ -49,12 +49,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
+    public String login(@RequestParam(required = false) String username,
+                        @RequestParam(required = false) String password,
                         HttpSession session,
-                        Model model) {
-        // 1. Kiểm tra để trống thủ công vì login dùng @RequestParam
-        if (username.isBlank() || password.isBlank()) {
+                        Model model) {// Bây giờ username/password sẽ là null nếu để trống, logic này sẽ bắt được:
+        if (username == null || password == null || username.isBlank() || password.isBlank()) {
             model.addAttribute("error", "Vui lòng nhập đầy đủ tài khoản và mật khẩu");
             return "auth/login";
         }
