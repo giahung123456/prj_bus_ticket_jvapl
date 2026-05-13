@@ -20,6 +20,7 @@ public class AdminController {
 
     @Autowired
     TicketService ticketService;
+
     @GetMapping({"/index"})
     public String adminDashboard(Model model) {
         // Giả sử bạn đã viết DashboardService như hướng dẫn trước

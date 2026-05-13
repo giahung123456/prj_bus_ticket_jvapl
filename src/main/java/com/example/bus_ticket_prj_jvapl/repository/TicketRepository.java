@@ -44,39 +44,36 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT t FROM Ticket t JOIN FETCH t.trip WHERE t.ticketCode = :code AND t.customerPhone = :phone")
     Optional<Ticket> findByTicketCodeAndPhone(@Param("code") String code, @Param("phone") String phone);
 
-
-
-// 1. Thống kê theo tuyến
-@Query("SELECT t.trip.route.departure.name || ' - ' || t.trip.route.destination.name as routeName, " +
-        "COUNT(t) as ticketCount, SUM(t.totalPrice) as totalRevenue " +
-        "FROM Ticket t " +
-        "WHERE t.status = com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus.PAID " + // Sửa ở đây
-        "GROUP BY t.trip.route.id, t.trip.route.departure.name, t.trip.route.destination.name")
-List<RevenueByRouteDTO> getRevenueStatsByRoute();
-
-
-// 3. Native Query (Thống kê theo tháng)
-@Query(value = "SELECT MONTHNAME(t.created_at) as month, SUM(t.total_price) as revenue " +
-        "FROM tickets t WHERE t.status = 'PAID' " + // Sửa ở đây (String cho Native Query)
-        "AND YEAR(t.created_at) = YEAR(CURDATE()) " +
-        "GROUP BY MONTH(t.created_at) " +
-        "ORDER BY MONTH(t.created_at)", nativeQuery = true)
-List<Object[]> getMonthlyRevenue();
-    // 3. Top 5 chuyến xe có lượt đặt cao nhất (Dùng JPQL)
-    @Query("SELECT t.trip.id as tripId, t.trip.route.departure.name || ' - ' || t.trip.route.destination.name as routeName, " +
-            "t.trip.departureTime as departureTime, COUNT(t) as bookingCount " +
+    // 1. Thống kê theo tuyến (Dùng Class DTO)
+    @Query("SELECT new com.example.bus_ticket_prj_jvapl.model.dto.RevenueByRouteDTO(" +
+            "t.trip.route.departure.name || ' - ' || t.trip.route.destination.name, " +
+            "COUNT(t), SUM(t.totalPrice)) " +
             "FROM Ticket t " +
-            "GROUP BY t.trip.id, t.trip.route.departure.name, t.trip.route.destination.name, t.trip.departureTime " +
+            "WHERE t.status = com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus.PAID " +
+            "GROUP BY t.trip.route.id, t.trip.route.departure.name, t.trip.route.destination.name")
+    List<RevenueByRouteDTO> getRevenueStatsByRoute();
+
+    @Query("SELECT new com.example.bus_ticket_prj_jvapl.model.dto.TopTripDTO(" +
+            "t.trip.id, " +
+            "t.trip.route.departure.name || ' - ' || t.trip.route.destination.name, " +
+            "t.trip.departureTime, " +
+            "COUNT(t), " +
+            "t.trip.bus.plateNumber, " + // Lấy biển số
+            "t.trip.bus.busType) " +     // Lấy loại xe (Giường nằm/Ghế ngồi)
+            "FROM Ticket t " +
+            "GROUP BY t.trip.id, t.trip.route.departure.name, t.trip.route.destination.name, " +
+            "t.trip.departureTime, t.trip.bus.plateNumber, t.trip.bus.busType " +
             "ORDER BY COUNT(t) DESC")
     List<TopTripDTO> findTop5ActiveTrips(Pageable pageable);
 
+    // 3. Doanh thu tháng hiện tại
+    @Query("SELECT SUM(t.totalPrice) FROM Ticket t " +
+            "WHERE t.status = com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus.PAID " +
+            "AND MONTH(t.createdAt) = MONTH(CURRENT_DATE) " +
+            "AND YEAR(t.createdAt) = YEAR(CURRENT_DATE)")
+    Double getTotalRevenueThisMonth();
 
-// 2. Doanh thu tháng hiện tại
-@Query("SELECT SUM(t.totalPrice) FROM Ticket t " +
-        "WHERE t.status = com.example.bus_ticket_prj_jvapl.model.entity.enums.TicketStatus.PAID " + // Sửa ở đây
-        "AND MONTH(t.createdAt) = MONTH(CURRENT_DATE) " +
-        "AND YEAR(t.createdAt) = YEAR(CURRENT_DATE)")
-Double getTotalRevenueThisMonth();
+
     // Xóa dòng cũ và thay bằng dòng này trong TicketRepository
     @Query("SELECT t FROM Ticket t WHERE t.customerPhone = :phone ORDER BY t.createdAt DESC")
     List<Ticket> findByCustomerPhone(@Param("phone") String phone);
